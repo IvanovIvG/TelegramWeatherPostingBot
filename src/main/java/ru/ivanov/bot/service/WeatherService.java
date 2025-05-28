@@ -1,6 +1,5 @@
 package ru.ivanov.bot.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.ivanov.bot.model.Weather;
@@ -14,7 +13,7 @@ public class WeatherService {
     private final DataBaseService dataBaseService;
     private final YandexWeatherService yandexWeatherService;
 
-    public Weather getWeatherFromYandexAndSaveInDatabase() throws JsonProcessingException {
+    public Weather getWeatherFromYandexAndSaveInDatabase() {
         Weather currentWeather = yandexWeatherService.getCurrentWeather();
         dataBaseService.saveWeather(currentWeather);
         return currentWeather;
