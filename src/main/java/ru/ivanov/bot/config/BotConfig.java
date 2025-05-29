@@ -16,6 +16,6 @@ public class BotConfig {
 
     @Bean
     public TelegramClient configureTelegramClient(){
-        return new OkHttpTelegramClient("7910820441:AAH3SlU29O2vC6FfQiYb6SgIFx2wbFBTJK4");
+        return new OkHttpTelegramClient(botToken);
     }
 }

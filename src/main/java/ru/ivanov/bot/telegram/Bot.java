@@ -16,6 +16,7 @@ import ru.ivanov.bot.model.enums.PhenomenaCondition;
 import ru.ivanov.bot.model.enums.PrecisionType;
 import ru.ivanov.bot.model.enums.Strength;
 import ru.ivanov.bot.repositories.WeatherRepository;
+import ru.ivanov.bot.service.WeatherService;
 
 /**
  * @author Ivan Ivanov
@@ -28,6 +29,7 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     String botToken;
     private final TelegramClient telegramClient;
     private final WeatherRepository repository;
+    private final WeatherService service;
     private final MessageBuilder messageBuilder;
 
     @Override
@@ -43,7 +45,7 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     @Override
     public void consume(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
-            Weather weather = repository.findById(5).orElseThrow();
+            Weather weather = service.getWeatherFromYandexAndSaveInDatabase();
             String messageText = messageBuilder.getWeatherMessage(weather);
             long chat_id = update.getMessage().getChatId();
 
