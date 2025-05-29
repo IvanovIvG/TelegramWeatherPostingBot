@@ -2,6 +2,7 @@ package ru.ivanov.bot.telegram;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
@@ -67,6 +68,22 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
             } catch (TelegramApiException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    public void sendMessageToChanel(){
+        Weather weather = service.getWeatherFromYandexAndSaveInDatabase();
+        String messageText = messageBuilder.getWeatherMessage(weather);
+        SendMessage messageToChannel = SendMessage
+                .builder()
+                .chatId(-1002618924720L)
+                .text(messageText)
+                .build();
+        try {
+            telegramClient.execute(messageToChannel);
+        } catch (TelegramApiException e) {
+            throw new RuntimeException(e);
         }
     }
 }
