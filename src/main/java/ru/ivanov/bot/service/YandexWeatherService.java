@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.ivanov.bot.model.Weather;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author Ivan Ivanov
  **/
@@ -22,11 +25,12 @@ public class YandexWeatherService {
     private final ObjectMapper objectMapper;
 
     public Weather getCurrentWeather(){
-        String url = "https://api.weather.yandex.ru/v2/forecast";
+        String url = "https://api.weather.yandex.ru/v2/forecast?lat={lat}&lon={lon}";
         HttpEntity<Void> requestEntity = createRequest();
+        Map<String, Float> uriParameters = createParameters();
 
         ResponseEntity<String> response = restTemplate.exchange(
-                url, HttpMethod.GET, requestEntity, String.class);
+                url, HttpMethod.GET, requestEntity, String.class, uriParameters);
 
         String weatherJson = response.getBody();
         try {
@@ -40,6 +44,13 @@ public class YandexWeatherService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Yandex-Weather-Key", "9308ba1f-746a-4e0a-8a70-b8bf59e41453");
         return new HttpEntity<>(headers);
+    }
+
+    private Map<String, Float> createParameters(){
+        Map<String, Float> uriParams = new HashMap<>();
+        uriParams.put("lat", 55.755863f);
+        uriParams.put("lon", 37.6177f);
+        return uriParams;
     }
 
     private Weather parseJson(String weatherJson) throws JsonProcessingException {
