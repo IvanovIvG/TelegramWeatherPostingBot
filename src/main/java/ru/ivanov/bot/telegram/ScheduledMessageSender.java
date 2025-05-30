@@ -29,7 +29,7 @@ public class ScheduledMessageSender {
     private final SubscribedUserRepository subscribedUserRepository;
     private final ChannelRepository channelRepository;
 
-    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     public void sendScheduledMessage() {
         Weather weather = service.getWeatherAndSaveInDatabase();
         String messageText = messageBuilder.getWeatherMessage(weather);
