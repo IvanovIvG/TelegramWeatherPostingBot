@@ -11,11 +11,15 @@ import ru.ivanov.bot.model.Weather;
 @RequiredArgsConstructor
 public class WeatherService {
     private final DataBaseService dataBaseService;
-    private final YandexWeatherService yandexWeatherService;
+    private final WebService webService;
 
-    public Weather getWeatherFromYandexAndSaveInDatabase() {
-        Weather currentWeather = yandexWeatherService.getCurrentWeather();
+    public Weather getWeatherAndSaveInDatabase() {
+        Weather currentWeather = webService.getCurrentWeather();
         dataBaseService.saveWeather(currentWeather);
         return currentWeather;
+    }
+
+    public Weather getWeather(){
+        return webService.getCurrentWeather();
     }
 }

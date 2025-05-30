@@ -20,7 +20,7 @@ import java.util.Map;
  **/
 @Component
 @RequiredArgsConstructor
-public class YandexWeatherService {
+public class WebService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 

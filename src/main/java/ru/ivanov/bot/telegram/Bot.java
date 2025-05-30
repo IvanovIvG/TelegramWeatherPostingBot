@@ -1,37 +1,52 @@
 package ru.ivanov.bot.telegram;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.telegram.telegrambots.extensions.bots.commandbot.CommandLongPollingTelegramBot;
+import org.telegram.telegrambots.extensions.bots.commandbot.commands.BotCommand;
 import org.telegram.telegrambots.longpolling.interfaces.LongPollingUpdateConsumer;
 import org.telegram.telegrambots.longpolling.starter.SpringLongPollingBot;
-import org.telegram.telegrambots.longpolling.util.LongPollingSingleThreadUpdateConsumer;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
-import ru.ivanov.bot.model.Weather;
-import ru.ivanov.bot.model.enums.PhenomenaCondition;
-import ru.ivanov.bot.model.enums.PrecisionType;
-import ru.ivanov.bot.model.enums.Strength;
-import ru.ivanov.bot.repositories.WeatherRepository;
-import ru.ivanov.bot.service.WeatherService;
+
+import java.util.List;
 
 /**
  * @author Ivan Ivanov
  **/
 @Component
-@Transactional
-@RequiredArgsConstructor
-public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
-    @Value("${bot.token}")
-    String botToken;
-    private final TelegramClient telegramClient;
-    private final WeatherRepository repository;
-    private final WeatherService service;
-    private final MessageBuilder messageBuilder;
+public class Bot extends CommandLongPollingTelegramBot implements SpringLongPollingBot {
+    private final String botToken;
+
+    public Bot(List<BotCommand> botCommands, TelegramClient telegramClient,
+               @Value("${bot.username}") String botUsername, @Value("${bot.token}") String botToken) {
+        super(telegramClient, true, () -> botUsername);
+        this.botToken = botToken;
+        registerAll(botCommands.toArray(BotCommand[]::new));
+    }
+
+
+    @Override
+    public void processNonCommandUpdate(Update update) {
+        if (update.hasMessage() && update.getMessage().hasText()) {
+            String messageText = """
+                    Ваша команда не распознана""";
+
+            SendMessage messageToChannel = SendMessage
+                    .builder()
+                    .chatId(update.getMessage().getChatId())
+                    .text(messageText)
+                    .build();
+            try {
+                telegramClient.execute(messageToChannel);
+            } catch (TelegramApiException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     @Override
     public String getBotToken() {
@@ -41,49 +56,5 @@ public class Bot implements SpringLongPollingBot, LongPollingSingleThreadUpdateC
     @Override
     public LongPollingUpdateConsumer getUpdatesConsumer() {
         return this;
-    }
-
-    @Override
-    public void consume(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            Weather weather = service.getWeatherFromYandexAndSaveInDatabase();
-            String messageText = messageBuilder.getWeatherMessage(weather);
-            long chat_id = update.getMessage().getChatId();
-
-            SendMessage messageToUser = SendMessage
-                    .builder()
-                    .chatId(chat_id)
-                    .text(messageText)
-                    .build();
-
-            SendMessage messageToChannel = SendMessage
-                    .builder()
-                    .chatId(-1002618924720L)
-                    .text(messageText)
-                    .build();
-
-            try {
-                telegramClient.execute(messageToUser);
-                telegramClient.execute(messageToChannel);
-            } catch (TelegramApiException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    @Scheduled(cron = "0 0 * * * *")
-    public void sendMessageToChanel(){
-        Weather weather = service.getWeatherFromYandexAndSaveInDatabase();
-        String messageText = messageBuilder.getWeatherMessage(weather);
-        SendMessage messageToChannel = SendMessage
-                .builder()
-                .chatId(-1002618924720L)
-                .text(messageText)
-                .build();
-        try {
-            telegramClient.execute(messageToChannel);
-        } catch (TelegramApiException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

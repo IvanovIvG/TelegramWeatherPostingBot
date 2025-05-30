@@ -1,6 +1,5 @@
 package ru.ivanov.bot.controller;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,7 +15,7 @@ public class TestController {
     private final WeatherService weatherService;
     @GetMapping("/weather")
     public Weather getWeather(){
-        return weatherService.getWeatherFromYandexAndSaveInDatabase();
+        return weatherService.getWeatherAndSaveInDatabase();
     }
 
 }

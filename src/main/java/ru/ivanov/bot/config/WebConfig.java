@@ -22,9 +22,4 @@ public class WebConfig {
         return new ObjectMapper().findAndRegisterModules().
                 configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
-
-    @Bean
-    public ModelMapper configModelMapper(){
-        return new ModelMapper();
-    }
 }
