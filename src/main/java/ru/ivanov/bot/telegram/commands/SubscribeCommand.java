@@ -9,7 +9,6 @@ import org.telegram.telegrambots.meta.api.objects.chat.Chat;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 import ru.ivanov.bot.model.SubscribedUser;
-import ru.ivanov.bot.repositories.SubscribedUserRepository;
 import ru.ivanov.bot.service.SubscribedUserService;
 
 /**
@@ -30,7 +29,7 @@ public class SubscribeCommand extends BotCommand {
     public void execute(TelegramClient telegramClient, User user, Chat chat, String[] strings) {
         SubscribedUser userToSubscribe = modelMapper.map(user, SubscribedUser.class);
         long userId = user.getId();
-        String messageText = "";
+        String messageText ;
         if(subscribedUserService.userIsNotSubscribed(userId)){
             subscribedUserService.subscribeUser(userToSubscribe);
             messageText = """

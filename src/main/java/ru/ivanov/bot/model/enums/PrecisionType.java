@@ -2,7 +2,6 @@ package ru.ivanov.bot.model.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
-import lombok.ToString;
 
 /**
  * @author Ivan Ivanov

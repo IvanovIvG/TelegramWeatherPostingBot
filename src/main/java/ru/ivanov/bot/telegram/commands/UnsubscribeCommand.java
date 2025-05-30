@@ -25,7 +25,7 @@ public class UnsubscribeCommand extends BotCommand {
     @Override
     public void execute(TelegramClient telegramClient, User user, Chat chat, String[] strings) {
         long userId = user.getId();
-        String messageText = "";
+        String messageText;
         if(subscribedUserService.userIsNotSubscribed(userId)){
             messageText = """
                 Вы не подписаны на рассылку погоды""";
